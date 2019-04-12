@@ -9,6 +9,11 @@ exchange = {}
 recipient_wallet_id_map = {}
 
 
+@app.route("/", methods=["GET"])
+def home():
+    return "PAPLE Mini Exchange"
+
+
 @app.route("/order_book", methods=["GET"])
 def get_order_book():
     exchange_key = "{}-to-{}".format(request.args.get("source_currency"), request.args.get("target_currency"))
