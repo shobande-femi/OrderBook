@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 from orderbook import OrderBook
 
@@ -163,4 +164,4 @@ def format_trades(trades, request_data):
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
