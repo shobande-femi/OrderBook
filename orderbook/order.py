@@ -1,5 +1,5 @@
-from decimal import * 
-import time, random
+from decimal import *
+
 
 class Order(object):
     '''
@@ -8,10 +8,11 @@ class Order(object):
     to help the exchange fullfill orders with quantities larger than a single
     existing Order.
     '''
+
     def __init__(self, quote, order_list):
-        self.timestamp = int(quote['timestamp']) # integer representing the timestamp of order creation
-        self.quantity = Decimal(quote['quantity']) # decimal representing amount of thing - can be partial amounts
-        self.price = Decimal(quote['price']) # decimal representing price (currency)
+        self.timestamp = int(quote['timestamp'])  # integer representing the timestamp of order creation
+        self.quantity = Decimal(quote['quantity'])  # decimal representing amount of thing - can be partial amounts
+        self.price = Decimal(quote['price'])  # decimal representing price (currency)
         self.order_id = int(quote['order_id'])
         self.trade_id = quote['trade_id']
         # doubly linked list to make it easier to re-order Orders for a particular price point
@@ -29,11 +30,15 @@ class Order(object):
     def update_quantity(self, new_quantity, new_timestamp):
         if new_quantity > self.quantity and self.order_list.tail_order != self:
             # check to see that the order is not the last order in list and the quantity is more
-            self.order_list.move_to_tail(self) # move to the end
-        self.order_list.volume -= (self.quantity - new_quantity) # update volume
+            self.order_list.move_to_tail(self)  # move to the end
+        self.order_list.volume -= (self.quantity - new_quantity)  # update volume
         self.timestamp = new_timestamp
         self.quantity = new_quantity
 
     def __str__(self):
-        return "{}@{}/{} - {}".format(self.quantity, self.price,
-                                      self.trade_id, self.timestamp)
+        return "OrderID:{} ** TimeStamp:{} ** Quantity:{} ** Price:{} ** TradeID:{}".format(self.order_id,
+                                                                                            self.timestamp,
+                                                                                            self.quantity, self.price,
+                                                                                            self.trade_id)
+        # return "{}@{}/{} - {}".format(self.quantity, self.price,
+        #                               self.trade_id, self.timestamp)

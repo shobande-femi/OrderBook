@@ -1,14 +1,15 @@
 import sys
-import math
-from collections import deque # a faster insert/pop queue
-from six.moves import cStringIO as StringIO
+from collections import deque  # a faster insert/pop queue
 from decimal import Decimal
+
+from six.moves import cStringIO as StringIO
 
 from .ordertree import OrderTree
 
+
 class OrderBook(object):
-    def __init__(self, tick_size = 0.0001):
-        self.tape = deque(maxlen=None) # Index[0] is most recent trade
+    def __init__(self, tick_size=0.0001):
+        self.tape = deque(maxlen=None)  # Index[0] is most recent trade
         self.bids = OrderTree()
         self.asks = OrderTree()
         self.last_tick = None
@@ -66,7 +67,7 @@ class OrderBook(object):
                 else:
                     self.asks.remove_order_by_id(head_order.order_id)
                 quantity_to_trade = 0
-            else: # quantity to trade is larger than the head order
+            else:  # quantity to trade is larger than the head order
                 traded_quantity = head_order.quantity
                 if side == 'bid':
                     self.bids.remove_order_by_id(head_order.order_id)
@@ -74,14 +75,20 @@ class OrderBook(object):
                     self.asks.remove_order_by_id(head_order.order_id)
                 quantity_to_trade -= traded_quantity
             if verbose:
-                print(("TRADE: Time - {}, Price - {}, Quantity - {}, TradeID - {}, Matching TradeID - {}".format(self.time, traded_price, traded_quantity, counter_party, quote['trade_id'])))
+                print((
+                    "TRADE: Time - {}, Price - {}, Quantity - {}, TradeID - {}, Matching TradeID - {}".format(self.time,
+                                                                                                              traded_price,
+                                                                                                              traded_quantity,
+                                                                                                              counter_party,
+                                                                                                              quote[
+                                                                                                                  'trade_id'])))
 
             transaction_record = {
-                    'timestamp': self.time,
-                    'price': traded_price,
-                    'quantity': traded_quantity,
-                    'time': self.time
-                    }
+                'timestamp': self.time,
+                'price': traded_price,
+                'quantity': traded_quantity,
+                'time': self.time
+            }
 
             if side == 'bid':
                 transaction_record['party1'] = [counter_party, 'bid', head_order.order_id, new_book_quantity]
@@ -93,7 +100,7 @@ class OrderBook(object):
             self.tape.append(transaction_record)
             trades.append(transaction_record)
         return quantity_to_trade, trades
-                    
+
     def process_market_order(self, quote, verbose):
         trades = []
         quantity_to_trade = quote['quantity']
@@ -101,12 +108,14 @@ class OrderBook(object):
         if side == 'bid':
             while quantity_to_trade > 0 and self.asks:
                 best_price_asks = self.asks.min_price_list()
-                quantity_to_trade, new_trades = self.process_order_list('ask', best_price_asks, quantity_to_trade, quote, verbose)
+                quantity_to_trade, new_trades = self.process_order_list('ask', best_price_asks, quantity_to_trade,
+                                                                        quote, verbose)
                 trades += new_trades
         elif side == 'ask':
             while quantity_to_trade > 0 and self.bids:
                 best_price_bids = self.bids.max_price_list()
-                quantity_to_trade, new_trades = self.process_order_list('bid', best_price_bids, quantity_to_trade, quote, verbose)
+                quantity_to_trade, new_trades = self.process_order_list('bid', best_price_bids, quantity_to_trade,
+                                                                        quote, verbose)
                 trades += new_trades
         else:
             sys.exit('process_market_order() recieved neither "bid" nor "ask"')
@@ -121,7 +130,8 @@ class OrderBook(object):
         if side == 'bid':
             while (self.asks and price >= self.asks.min_price() and quantity_to_trade > 0):
                 best_price_asks = self.asks.min_price_list()
-                quantity_to_trade, new_trades = self.process_order_list('ask', best_price_asks, quantity_to_trade, quote, verbose)
+                quantity_to_trade, new_trades = self.process_order_list('ask', best_price_asks, quantity_to_trade,
+                                                                        quote, verbose)
                 trades += new_trades
             # If volume remains, need to update the book with new quantity
             if quantity_to_trade > 0:
@@ -133,7 +143,8 @@ class OrderBook(object):
         elif side == 'ask':
             while (self.bids and price <= self.bids.max_price() and quantity_to_trade > 0):
                 best_price_bids = self.bids.max_price_list()
-                quantity_to_trade, new_trades = self.process_order_list('bid', best_price_bids, quantity_to_trade, quote, verbose)
+                quantity_to_trade, new_trades = self.process_order_list('bid', best_price_bids, quantity_to_trade,
+                                                                        quote, verbose)
                 trades += new_trades
             # If volume remains, need to update the book with new quantity
             if quantity_to_trade > 0:
@@ -228,11 +239,11 @@ class OrderBook(object):
         if self.tape != None and len(self.tape) > 0:
             num = 0
             for entry in self.tape:
-                if num < 10: # get last 5 entries
-                    tempfile.write(str(entry['quantity']) + " @ " + str(entry['price']) + " (" + str(entry['timestamp']) + ") " + str(entry['party1'][0]) + "/" + str(entry['party2'][0]) + "\n")
+                if num < 10:  # get last 5 entries
+                    tempfile.write(str(entry['quantity']) + " @ " + str(entry['price']) + " (" + str(
+                        entry['timestamp']) + ") " + str(entry['party1'][0]) + "/" + str(entry['party2'][0]) + "\n")
                     num += 1
                 else:
                     break
         tempfile.write("\n")
         return tempfile.getvalue()
-
