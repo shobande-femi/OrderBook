@@ -51,7 +51,7 @@ def add_liquidity():
 
     # asynchronously submit payments
     if len(payments) > 0:
-        thread = threading.Thread(target=make_payments, args=payments)
+        thread = threading.Thread(target=make_payments, args=[payments])
         thread.start()
 
     return jsonify({
@@ -107,7 +107,7 @@ def market_order():
 
     # asynchronously submit payments
     if len(payments) > 0:
-        thread = threading.Thread(target=make_payments, args=payments)
+        thread = threading.Thread(target=make_payments, args=[payments])
         thread.start()
 
     return jsonify({
