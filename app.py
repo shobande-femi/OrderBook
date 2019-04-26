@@ -138,7 +138,7 @@ def make_payments(payments):
             "anonymous": True
         })
 
-    resp = requests.post(url, data={"payments": data})
+    resp = requests.post(url, json={"payments": data})
     print(resp.status_code, resp.reason, resp.content)
 
 
