@@ -112,7 +112,7 @@ def format_order(order):
     return {
         "order_id": order.order_id,
         "quantity": order.quantity,
-        "price": round(order.price, 4),
+        "price": str(round(order.price, 4)),
         "trader_id": order.trade_id
     }
 
