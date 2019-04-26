@@ -121,9 +121,17 @@ def make_payments(payments):
 
     data = []
     for payment in payments:
+        sender = payment["sender"]
+        if sender[:3] == "LP_":
+            sender = "{}_{}".format(sender, payment["currency"])
+
+        recipient = payment["recipient"]
+        if recipient[:3] == "LP_":
+            recipient = "{}_{}".format(recipient, payment["currency"])
+
         data.append({
-            "senderWalletId": payment["sender"],
-            "recipientWalletId": payment["recipient"],
+            "senderWalletId": sender,
+            "recipientWalletId": recipient,
             "amount": payment["quantity"]*100,
             "currencyCode": payment["currency"],
             "type": "REGULAR",
