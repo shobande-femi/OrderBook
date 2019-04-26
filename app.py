@@ -110,10 +110,10 @@ def market_order():
 
 def format_order(order):
     return {
-        "order_id": order.order_id,
-        "quantity": order.quantity,
+        "order_id": str(order.order_id),
+        "quantity": str(order.quantity),
         "price": str(round(order.price, 4)),
-        "trader_id": order.trade_id
+        "trader_id": str(order.trade_id)
     }
 
 
