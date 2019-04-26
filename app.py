@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests
+import threading
 
 from orderbook import OrderBook
 
@@ -48,6 +50,9 @@ def add_liquidity():
     payments = format_trades(trades, request_data)[0]
 
     # asynchronously submit payments
+    if len(payments) > 0:
+        thread = threading.Thread(target=make_payments, args=payments)
+        thread.start()
 
     return jsonify({
         "order_book": format_order_book(order_book),
@@ -101,11 +106,32 @@ def market_order():
             })
 
     # asynchronously submit payments
+    if len(payments) > 0:
+        thread = threading.Thread(target=make_payments, args=payments)
+        thread.start()
 
     return jsonify({
         "payments": payments,
         "msg": "Order Fully Executed"
     })
+
+
+def make_payments(payments):
+    url = "http://paple.westeurope.cloudapp.azure.com:10050/paple/transfer/payments"
+
+    data = []
+    for payment in payments:
+        data.append({
+            "senderWalletId": payment["sender"],
+            "recipientWalletId": payment["recipient"],
+            "amount": payment["quantity"]*100,
+            "currencyCode": payment["currency"],
+            "type": "REGULAR",
+            "anonymous": True
+        })
+
+    resp = requests.post(url, data={"payments": data})
+    print(resp.status_code, resp.reason, resp.content)
 
 
 def format_order(order):
