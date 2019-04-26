@@ -45,9 +45,13 @@ def add_liquidity():
 
     trades, _ = order_book.process_order(order, False, False)
 
+    payments = format_trades(trades, request_data)[0]
+
+    # asynchronously submit payments
+
     return jsonify({
         "order_book": format_order_book(order_book),
-        "payments": format_trades(trades, request_data)[0]
+        "payments": payments
     }), 201
 
 
@@ -95,6 +99,9 @@ def market_order():
                 "msg": "Not enough liquidity to fulfil full order. Also couldn't determine price to place ask offer, "
                        "hence no ask order is placed"
             })
+
+    # asynchronously submit payments
+
     return jsonify({
         "payments": payments,
         "msg": "Order Fully Executed"
@@ -103,10 +110,10 @@ def market_order():
 
 def format_order(order):
     return {
-        "order_id": order["OrderID"],
-        "quantity": order["Quantity"],
-        "price": round(order["Price"], 4),
-        "trader_id": order["TradeID"]
+        "order_id": order.order_id,
+        "quantity": order.quantity,
+        "price": round(order.price, 4),
+        "trader_id": order.trade_id
     }
 
 
