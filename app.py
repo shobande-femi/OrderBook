@@ -101,12 +101,21 @@ def market_order():
     })
 
 
+def format_order(order):
+    return {
+        "order_id": order["OrderID"],
+        "quantity": order["Quantity"],
+        "price": round(order["Price"], 4),
+        "trader_id": order["TradeID"]
+    }
+
+
 def format_order_book(order_book):
     bid_price_map = {}
     for price, order_list in order_book.bids.price_map.items():
         temp_order_list = {}
         for order in order_list:
-            temp_order_list[order.order_id] = str(order)
+            temp_order_list[order.order_id] = format_order(order)
 
         bid_price_map[str(round(price, 4))] = temp_order_list
 
@@ -114,7 +123,7 @@ def format_order_book(order_book):
     for price, order_list in order_book.asks.price_map.items():
         temp_order_list = {}
         for order in order_list:
-            temp_order_list[order.order_id] = str(order)
+            temp_order_list[order.order_id] = format_order(order)
 
         ask_price_map[str(round(price, 4))] = temp_order_list
 
