@@ -106,9 +106,9 @@ def market_order():
             })
 
     # asynchronously submit payments
-    if len(payments) > 0:
-        thread = threading.Thread(target=make_payments, args=[payments])
-        thread.start()
+    # if len(payments) > 0:
+    #     thread = threading.Thread(target=make_payments, args=[payments])
+    #     thread.start()
 
     return jsonify({
         "payments": payments,
@@ -132,7 +132,7 @@ def make_payments(payments):
         data.append({
             "senderAccountId": sender,
             "recipientAccountId": recipient,
-            "amount": payment["amount"]*100,
+            "amount": payment["amount"],
             "currencyCode": payment["currencyCode"],
             # "type": "REGULAR",
             # "anonymous": True
