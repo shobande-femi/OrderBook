@@ -121,21 +121,21 @@ def make_payments(payments):
 
     data = []
     for payment in payments:
-        sender = payment["sender"]
+        sender = payment["senderAccountId"]
         if sender[:3] == "LP_":
-            sender = "{}_{}".format(sender, payment["currency"])
+            sender = "{}_{}".format(sender, payment["currencyCode"])
 
-        recipient = payment["recipient"]
+        recipient = payment["recipientAccountId"]
         if recipient[:3] == "LP_":
-            recipient = "{}_{}".format(recipient, payment["currency"])
+            recipient = "{}_{}".format(recipient, payment["currencyCode"])
 
         data.append({
-            "senderWalletId": sender,
-            "recipientWalletId": recipient,
-            "amount": payment["quantity"]*100,
-            "currencyCode": payment["currency"],
-            "type": "REGULAR",
-            "anonymous": True
+            "senderAccountId": sender,
+            "recipientAccountId": recipient,
+            "amount": payment["amount"]*100,
+            "currencyCode": payment["currencyCode"],
+            # "type": "REGULAR",
+            # "anonymous": True
         })
 
     print(data)
@@ -182,34 +182,34 @@ def format_trades(trades, request_data):
     for trade in trades:
         remaining_order -= trade["quantity"]
 
-        # "recipient": request_data.get("recipient_wallet_id") or recipient_wallet_id_map[trade["party1"][2]]
+        # "recipientAccountId": request_data.get("recipient_wallet_id") or recipient_wallet_id_map[trade["party1"][2]]
         # if ultimate_recipient_id is None: this must have emanated from an ask
         ultimate_recipient_id = request_data.get("recipient_wallet_id")
         if ultimate_recipient_id is None:
             payments.append({
-                "sender": trade["party2"][0],
-                "recipient": recipient_wallet_id_map[trade["party1"][2]],
-                "currency": request_data["source_currency"],
-                "quantity": round(float(trade["quantity"]) * float(trade["price"]), 2)
+                "senderAccountId": trade["party2"][0],
+                "recipientAccountId": recipient_wallet_id_map[trade["party1"][2]],
+                "currencyCode": request_data["source_currency"],
+                "amount": round(float(trade["quantity"]) * float(trade["price"]), 2)
             })
             payments.append({
-                "sender": trade["party1"][0],
-                "recipient": trade["party2"][0],
-                "currency": request_data["target_currency"],
-                "quantity": float(trade["quantity"])
+                "senderAccountId": trade["party1"][0],
+                "recipientAccountId": trade["party2"][0],
+                "currencyCode": request_data["target_currency"],
+                "amount": float(trade["quantity"])
             })
         else:
             payments.append({
-                "sender": trade["party2"][0],
-                "recipient": trade["party1"][0],
-                "currency": request_data["source_currency"],
-                "quantity": float(trade["quantity"])
+                "senderAccountId": trade["party2"][0],
+                "recipientAccountId": trade["party1"][0],
+                "currencyCode": request_data["source_currency"],
+                "amount": float(trade["quantity"])
             })
             payments.append({
-                "sender": trade["party1"][0],
-                "recipient": request_data["recipient_wallet_id"],
-                "currency": request_data["target_currency"],
-                "quantity": round(float(trade["quantity"]) * float(trade["price"]), 2)
+                "senderAccountId": trade["party1"][0],
+                "recipientAccountId": request_data["recipient_wallet_id"],
+                "currencyCode": request_data["target_currency"],
+                "amount": round(float(trade["quantity"]) * float(trade["price"]), 2)
             })
     return payments, remaining_order
 
